@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: admin
+      POSTGRES_DB: mydatabase
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://admin:password@db/mydatabase
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: /bin/sh -c "npm install"
+  flaskapp:
+    build: ./flask
+    ports:
+      - "5000:5000"
+
+# version: '1.0'
+
+# services:
+#   db: 
+#     image: postgres
+#     restart: always
+#     ports: 
+#       - "5432:5432"
+#     environment: 
+#       POSTGRES_PASSWORD: password
+#       POSTGRES_USER: admin

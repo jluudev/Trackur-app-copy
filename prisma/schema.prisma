@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserToLikedPost {
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
+  userId Int
+  postId Int
+  @@id([userId, postId])
+}
+
+model User {
+  id  Int @id @default(autoincrement())
+  username String @unique
+  password String
+  profilePicture String?
+  liked_posts UserToLikedPost[]
+  liked_comments Int[]
+  posts Post[]
+  role Role @default(USER)
+  comments Comment[]
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  picture String
+  caption String
+  timestamp DateTime
+  latitude Float
+  longitude Float
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  animal Animal @relation(fields: [animalName], references: [name])
+  likedBy UserToLikedPost[]
+  animalName String
+  comments Comment[]
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+model Animal {
+  name String @id
+  posts Post[]
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+  timestamp DateTime
+  comment String
+  like_count Int @default(0)
+  post Post @relation(fields: [postId], references: [id])
+  postId Int
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+}
